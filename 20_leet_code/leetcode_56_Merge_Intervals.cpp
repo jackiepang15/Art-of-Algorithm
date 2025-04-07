@@ -1,43 +1,35 @@
 #include <vector>
-#include <map>
-#include <string>
-#include <limits>
 #include <algorithm>
 
 using namespace std;
 
-struct Interval
-{
-    int start;
-    int end;
-    Interval() : start(0), end(0) {}
-    Interval(int s, int e) : start(s), end(e) {}
-};
-
 class Solution
 {
 public:
-    vector<Interval> merge(vector<Interval> &ins)
+    static bool compare(vector<int> &x, vector<int> &y)
     {
-        if (ins.empty())
-        {
-            return vector<Interval>{};
-        }
-        sort(ins.begin(), ins.end(), [](Interval a, Interval b)
-             { return a.start < b.start; });
+        return x[0] < y[0] || (x[0] == y[0] && x[1] < y[1]);
+    }
 
-        vector<Interval> res(1, ins.front());
-        for (int i = 1; i < ins.size(); ++i)
+    vector<vector<int>> merge(vector<vector<int>> &intervals)
+    {
+        sort(intervals.begin(), intervals.end(), compare);
+        vector<vector<int>> result;
+        int size(intervals.size());
+        vector<int> current(intervals[0]);
+        for (int i = 1; i < size; ++i)
         {
-            if (res.back().end < ins[i].start)
+            if (intervals[i][0] <= current[1])
             {
-                res.push_back(ins[i]);
+                current[1] = max(current[1], intervals[i][1]);
             }
             else
             {
-                res.back().end = max(res.back().end, ins[i].end);
+                result.push_back(current);
+                current = intervals[i];
             }
         }
-        return res;
+        result.push_back(current);
+        return result;
     }
 };

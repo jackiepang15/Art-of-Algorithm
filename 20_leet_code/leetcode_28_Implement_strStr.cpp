@@ -1,7 +1,4 @@
-#include <vector>
-#include <map>
 #include <string>
-#include <limits>
 
 using namespace std;
 
@@ -10,29 +7,19 @@ class Solution
 public:
     int strStr(string haystack, string needle)
     {
-        if (needle.empty())
-            return 0;
-
-        vector<int> next(needle.size(), 0);
-        for (int i = 1, k = 0; i < needle.size(); ++i)
+        int size(haystack.size() - needle.size() + 1);
+        for (int i = 0; i < size; ++i)
         {
-            while (k && needle[k] != needle[i])
-                k = next[k - 1];
-            if (needle[k] == needle[i])
-                ++k;
-            next[i] = k;
+            bool match(true);
+            for (int j = 0; j < needle.size() && match; ++j)
+            {
+                match = needle[j] == haystack[i + j];
+            }
+            if (match)
+            {
+                return i;
+            }
         }
-
-        for (int i = 0, k = 0; i < haystack.size(); ++i)
-        {
-            while (k && needle[k] != haystack[i])
-                k = next[k - 1];
-            if (needle[k] == haystack[i])
-                ++k;
-            if (k == needle.size())
-                return i - k + 1;
-        }
-
         return -1;
     }
 };

@@ -1,7 +1,4 @@
 #include <vector>
-#include <map>
-#include <string>
-#include <limits>
 
 using namespace std;
 
@@ -10,43 +7,78 @@ class Solution
 public:
     bool isValidSudoku(vector<vector<char>> &board)
     {
-        std::vector<std::vector<bool>> rowFilled(9, std::vector<bool>(9, false));
-        std::vector<std::vector<bool>> colFilled(9, std::vector<bool>(9, false));
-        std::vector<std::vector<bool>> grdFilled(9, std::vector<bool>(9, false));
-        for (int gy = 0; gy < 3; ++gy)
+        bool valid(true);
+        for (int i = 0; i < 9; ++i)
         {
-            for (int gx = 0; gx < 3; ++gx)
+            vector<bool> contain(9, false);
+            for (int j = 0; j < 9; ++j)
             {
-                for (int y = 0; y < 3; ++y)
+                if (board[i][j] == '.')
                 {
-                    for (int x = 0; x < 3; ++x)
-                    {
-                        int r = gy * 3 + y;
-                        int c = gx * 3 + x;
-                        int g = gy * 3 + gx;
-                        int v = board[r][c] == '.' ? -1 : board[r][c] - '1';
-                        if (v >= 0)
-                        {
-                            if (grdFilled[g][v])
-                            {
-                                return false;
-                            }
-                            grdFilled[g][v] = true;
-
-                            if (rowFilled[r][v])
-                            {
-                                return false;
-                            }
-                            rowFilled[r][v] = true;
-
-                            if (colFilled[c][v])
-                            {
-                                return false;
-                            }
-                            colFilled[c][v] = true;
-                        }
-                    }
+                    continue;
                 }
+                int v(board[i][j] - '1');
+                if (contain[v])
+                {
+                    return false;
+                }
+                contain[v] = true;
+            }
+        }
+        for (int i = 0; i < 9; ++i)
+        {
+            vector<bool> contain(9, false);
+            for (int j = 0; j < 9; ++j)
+            {
+                if (board[j][i] == '.')
+                {
+                    continue;
+                }
+                int v(board[j][i] - '1');
+                if (contain[v])
+                {
+                    return false;
+                }
+                contain[v] = true;
+            }
+        }
+        vector<pair<int, int>> center = {
+            {1, 1},
+            {1, 4},
+            {1, 7},
+            {4, 1},
+            {4, 4},
+            {4, 7},
+            {7, 1},
+            {7, 4},
+            {7, 7}};
+        vector<pair<int, int>> delta = {
+            {-1, -1},
+            {-1, 0},
+            {-1, 1},
+            {0, -1},
+            {0, 0},
+            {0, 1},
+            {1, -1},
+            {1, 0},
+            {1, 1}};
+        for (int i = 0; i < 9; ++i)
+        {
+            vector<bool> contain(9, false);
+            for (int j = 0; j < 9; ++j)
+            {
+                int r = center[i].first + delta[j].first;
+                int c = center[i].second + delta[j].second;
+                if (board[r][c] == '.')
+                {
+                    continue;
+                }
+                int v(board[r][c] - '1');
+                if (contain[v])
+                {
+                    return false;
+                }
+                contain[v] = true;
             }
         }
         return true;

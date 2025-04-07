@@ -1,7 +1,4 @@
 #include <vector>
-#include <map>
-#include <string>
-#include <limits>
 
 using namespace std;
 
@@ -10,17 +7,21 @@ class Solution
 public:
     vector<int> productExceptSelf(vector<int> &nums)
     {
-        int n(nums.size());
-        int prodBegin(1);
-        int prodLast(1);
-        vector<int> res(n, 1);
-        for (int i = 0; i < n; i++)
+        int size(nums.size());
+        vector<int> result(size);
+        result[size - 1] = nums[size - 1];
+        for (int i = size - 2; i > 0; --i)
         {
-            res[i] *= prodBegin;
-            prodBegin *= nums[i];
-            res[n - 1 - i] *= prodLast;
-            prodLast *= nums[n - 1 - i];
+            result[i] = result[i + 1] * nums[i];
         }
-        return res;
+        int product(nums[0]);
+        result[0] = result[1];
+        for (int i = 1; i < size - 1; ++i)
+        {
+            result[i] = result[i + 1] * product;
+            product *= nums[i];
+        }
+        result[size - 1] = product;
+        return result;
     }
 };

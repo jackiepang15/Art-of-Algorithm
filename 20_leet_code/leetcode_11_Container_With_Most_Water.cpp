@@ -1,7 +1,4 @@
 #include <vector>
-#include <map>
-#include <string>
-#include <limits>
 
 using namespace std;
 
@@ -10,29 +7,23 @@ class Solution
 public:
     int maxArea(vector<int> &height)
     {
-        int left(0);
-        int right(height.size() - 1);
-        int area(0);
-        while (left < right)
+        int start(0), end(height.size() - 1);
+        int h(min(height[start], height[end]));
+        int area((end - start) * h);
+        while (start < end)
         {
-            area = max(area, min(height[left], height[right]) * (right - left));
-            if (height[left] <= height[right])
+            while (start < end && height[start] <= h)
             {
-                ++left;
-                while (left < right && height[left] <= height[right])
-                {
-                    area = max(area, min(height[left], height[right]) * (right - left));
-                    ++left;
-                }
+                ++start;
             }
-            else
+            while (end > start && height[end] <= h)
             {
-                --right;
-                while (left < right && height[right] <= height[left])
-                {
-                    area = max(area, min(height[left], height[right]) * (right - left));
-                    --right;
-                }
+                --end;
+            }
+            if (start < end)
+            {
+                h = min(height[start], height[end]);
+                area = max(area, (end - start) * h);
             }
         }
         return area;

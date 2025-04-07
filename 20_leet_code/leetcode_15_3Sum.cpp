@@ -1,9 +1,4 @@
 #include <vector>
-#include <map>
-#include <string>
-#include <set>
-#include <tuple>
-#include <limits>
 #include <algorithm>
 
 using namespace std;
@@ -14,42 +9,44 @@ public:
     vector<vector<int>> threeSum(vector<int> &nums)
     {
         vector<vector<int>> results;
-        set<tuple<int, int>> resultSet;
-        if (nums.empty())
-        {
-            return results;
-        }
         sort(nums.begin(), nums.end());
-        map<int, int> map1;
-        for (int k = 0; k < nums.size(); ++k)
+        for (int i = nums.size() - 1; i >= 2; --i)
         {
-            map1[nums[k]] = k;
-        }
-        map<int, set<int>> map2;
-        for (int i = 0; i < nums.size() - 1; ++i)
-        {
-            for (int j = i + 1; j < nums.size(); ++j)
+            if (i < nums.size() - 1 && nums[i] == nums[i + 1])
             {
-                int sum2(nums[i] + nums[j]);
-                if (-sum2 < nums[i] || -sum2 > nums[j])
+                continue;
+            }
+            int target = -nums[i];
+            int start(0), end(i - 1);
+            while (start < end)
+            {
+                int sum = nums[start] + nums[end];
+                if (sum == target)
                 {
-                    continue;
+                    vector<int> result({nums[i], nums[end], nums[start]});
+                    if (results.empty())
+                    {
+                        results.push_back(result);
+                    }
+                    else
+                    {
+                        vector<int> &back(results.back());
+                        if (result[1] != back[1] || result[2] != back[2])
+                        {
+                            results.push_back(result);
+                        }
+                    }
+                    ++start;
+                    --end;
                 }
-                if (map2.count(sum2) > 0 && map2[sum2].count(nums[i]) > 0)
+                else if (sum < target)
                 {
-                    continue;
+                    ++start;
                 }
-                if (map1.count(-sum2) == 0)
+                else
                 {
-                    continue;
+                    --end;
                 }
-                int k(map1[-sum2]);
-                if (k == i || k == j)
-                {
-                    continue;
-                }
-                map2[sum2].insert(nums[i]);
-                results.push_back(vector<int>({nums[i], nums[k], nums[j]}));
             }
         }
         return results;

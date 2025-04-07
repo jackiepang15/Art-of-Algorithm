@@ -1,7 +1,4 @@
 #include <vector>
-#include <map>
-#include <string>
-#include <limits>
 
 using namespace std;
 
@@ -10,36 +7,27 @@ class Solution
 public:
     int majorityElement(vector<int> &nums)
     {
-        int number(nums.front());
-        int count(0), index(0);
-        while (index + 1 < nums.size())
+        int time(0), val(0), size(nums.size());
+        for (int i = 0; i < size; ++i)
         {
-            int first(nums[index]);
-            int second(nums[index + 1]);
-            if (first == second)
+            int num(nums[i]);
+            if (time == 0)
             {
-                if (count == 0)
+                val = num;
+                ++time;
+            }
+            else
+            {
+                if (num != val)
                 {
-                    number = first;
-                }
-                if (first == number)
-                {
-                    count += 2;
+                    --time;
                 }
                 else
                 {
-                    count -= 2;
+                    ++time;
                 }
             }
-            index += 2;
         }
-        if (count > 0)
-        {
-            return number;
-        }
-        else
-        {
-            return nums.back();
-        }
+        return val;
     }
 };

@@ -1,7 +1,4 @@
 #include <vector>
-#include <map>
-#include <string>
-#include <limits>
 
 using namespace std;
 
@@ -10,24 +7,33 @@ class Solution
 public:
     int canCompleteCircuit(vector<int> &gas, vector<int> &cost)
     {
-        vector<int> value(gas.size());
-        for (int i = 0; i < gas.size(); ++i)
+        int size(gas.size());
+        for (int i = 0; i < size;)
         {
-            value[i] = gas[i] - cost[i];
-        }
-        int total(0);
-        int curValue(0);
-        int curIndex(0);
-        for (int i = 0; i < value.size(); ++i)
-        {
-            curValue += value[i];
-            total += value[i];
-            if (curValue < 0)
+            int tank(0);
+            int k = i;
+            for (int j = 0; j < size && tank >= 0; ++j)
             {
-                curValue = 0;
-                curIndex = i + 1;
+                k = (i + j) % size;
+                tank += gas[k] - cost[k];
+            }
+            if (tank >= 0)
+            {
+                return i;
+            }
+            if (k < i)
+            {
+                return -1;
+            }
+            if (k > i)
+            {
+                i = k;
+            }
+            else
+            {
+                ++i;
             }
         }
-        return total < 0 || curIndex == value.size() ? -1 : curIndex;
+        return -1;
     }
 };
