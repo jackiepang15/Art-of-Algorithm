@@ -1,17 +1,14 @@
-#include <vector>
-#include <map>
-#include <string>
-#include <limits>
-
-using namespace std;
-
-int trailingZeroes(int n)
+class Solution
 {
-    int number = 0;
-    while (n > 0)
+public:
+    int trailingZeroes(int n)
     {
-        n /= 5;
-        number += n;
+        int count(0);
+        while (n > 0)
+        {
+            n /= 5;
+            count += n;
+        }
+        return count;
     }
-    return number;
-}
+};

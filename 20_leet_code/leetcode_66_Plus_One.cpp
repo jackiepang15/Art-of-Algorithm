@@ -1,7 +1,4 @@
 #include <vector>
-#include <map>
-#include <string>
-#include <limits>
 
 using namespace std;
 
@@ -10,23 +7,20 @@ class Solution
 public:
     vector<int> plusOne(vector<int> &digits)
     {
-        if (digits.size() == 0)
+        int i = digits.size() - 1;
+        ++digits[i];
+        while (i > 0 && digits[i] > 9)
         {
-            return digits;
+            int d(digits[i] / 10);
+            digits[i] = digits[i] % 10;
+            --i;
+            digits[i] += d;
         }
-
-        int position = digits.size() - 1;
-        while (position >= 0 && digits[position] == 9)
+        if (i == 0 && digits[i] > 9)
         {
-            digits[position--] = 0;
-        }
-        if (position >= 0)
-        {
-            digits[position]++;
-        }
-        else
-        {
-            digits.insert(digits.begin(), 1);
+            int d(digits[i] / 10);
+            digits[i] = digits[i] % 10;
+            digits.insert(digits.begin(), d);
         }
         return digits;
     }

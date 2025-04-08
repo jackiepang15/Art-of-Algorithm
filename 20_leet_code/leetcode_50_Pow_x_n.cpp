@@ -1,10 +1,3 @@
-#include <vector>
-#include <map>
-#include <string>
-#include <limits>
-
-using namespace std;
-
 class Solution
 {
 public:
@@ -14,40 +7,17 @@ public:
         {
             return 0.0;
         }
-        if (n == 0)
+        double ret(1.0);
+        double p(n > 0 ? x : 1.0 / x);
+        while (n != 0)
         {
-            return 1.0;
-        }
-        else if (n > 0)
-        {
-            double p(x);
-            double ret(1.0);
-            while (n > 0)
+            if (n % 2 != 0)
             {
-                if (n & 1)
-                {
-                    ret *= p;
-                }
-                p *= p;
-                n >>= 1;
+                ret *= p;
             }
-            return ret;
+            p *= p;
+            n /= 2;
         }
-        else
-        {
-            n = -n;
-            double p(x);
-            double ret(1.0);
-            while (n > 0)
-            {
-                if (n & 1)
-                {
-                    ret *= p;
-                }
-                p *= p;
-                n >>= 1;
-            }
-            return 1.0 / ret;
-        }
+        return ret;
     }
 };
