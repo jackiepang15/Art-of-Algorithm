@@ -1,7 +1,4 @@
 #include <vector>
-#include <map>
-#include <string>
-#include <limits>
 
 using namespace std;
 
@@ -10,18 +7,20 @@ class Solution
 public:
     int maxProfit(vector<int> &prices)
     {
+        int prpfit(0);
         if (prices.empty())
         {
-            return 0;
+            return prpfit;
         }
-        int profit(0);
-        for (int i = 1; i < prices.size(); ++i)
+        int size(prices.size());
+        for (int i = 1; i < size; ++i)
         {
-            if (prices[i] > prices[i - 1])
+            int delta(prices[i] - prices[i - 1]);
+            if (delta > 0)
             {
-                profit += prices[i] - prices[i - 1];
+                prpfit += delta;
             }
         }
-        return profit;
+        return prpfit;
     }
 };

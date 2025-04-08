@@ -1,7 +1,4 @@
 #include <vector>
-#include <map>
-#include <string>
-#include <limits>
 
 using namespace std;
 
@@ -10,82 +7,58 @@ class Solution
 public:
     void setZeroes(vector<vector<int>> &matrix)
     {
-
-        int rows = matrix.size();
-        if (rows == 0)
+        int rows(matrix.size());
+        int cols(matrix.front().size());
+        bool firstRow(matrix[0][0] == 0);
+        for (int i = 1; i < cols; ++i)
         {
-            return;
-        }
-
-        int cols = matrix.front().size();
-        if (cols == 0)
-        {
-            return;
-        }
-
-        bool clearAll = matrix[0][0] == 0;
-        bool clearCol = clearAll;
-        if (!clearCol)
-        {
-            for (int r = 1; r < rows && !clearCol; ++r)
+            firstRow |= matrix[0][i] == 0;
+            bool zero(false);
+            for (int j = 0; j < rows; ++j)
             {
-                clearCol = matrix[r][0] == 0;
+                zero |= matrix[j][i] == 0;
+            }
+            if (zero)
+            {
+                matrix[0][i] = 0;
             }
         }
-        bool clearRow = clearAll;
-        if (!clearRow)
+        bool firstCol(matrix[0][0] == 0);
+        for (int i = 1; i < rows; ++i)
         {
-            for (int c = 1; c < cols && !clearRow; ++c)
+            firstCol |= matrix[i][0] == 0;
+            bool zero(false);
+            for (int j = 0; j < cols; ++j)
             {
-                clearRow = matrix[0][c] == 0;
+                zero |= matrix[i][j] == 0;
+            }
+            if (zero)
+            {
+                matrix[i][0] = 0;
             }
         }
-
-        for (int r = 1; r < rows; ++r)
+        for (int i = 1; i < rows; ++i)
         {
-            for (int c = 1; c < cols && matrix[r][0]; ++c)
+            for (int j = 1; j < cols; ++j)
             {
-                if (!matrix[r][c])
+                if (matrix[0][j] == 0 || matrix[i][0] == 0)
                 {
-                    matrix[r][0] = 0;
+                    matrix[i][j] = 0;
                 }
             }
         }
-        for (int c = 1; c < cols; ++c)
+        if (firstRow)
         {
-            for (int r = 1; r < rows && matrix[0][c]; ++r)
+            for (int i = 0; i < cols; ++i)
             {
-                if (!matrix[r][c])
-                {
-                    matrix[0][c] = 0;
-                }
+                matrix[0][i] = 0;
             }
         }
-
-        for (int r = 1; r < rows; ++r)
+        if (firstCol)
         {
-            for (int c = 1; c < cols; ++c)
+            for (int i = 0; i < rows; ++i)
             {
-                if (!matrix[r][0] || !matrix[0][c])
-                {
-                    matrix[r][c] = 0;
-                }
-            }
-        }
-
-        if (clearAll || clearCol)
-        {
-            for (int r = 0; r < rows; ++r)
-            {
-                matrix[r][0] = 0;
-            }
-        }
-
-        if (clearAll || clearRow)
-        {
-            for (int c = 0; c < cols; ++c)
-            {
-                matrix[0][c] = 0;
+                matrix[i][0] = 0;
             }
         }
     }

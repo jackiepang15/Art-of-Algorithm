@@ -5,15 +5,14 @@ using namespace std;
 class Solution
 {
 public:
-    bool canJump(vector<int> &nums)
+    int jump(vector<int> &nums)
     {
         if (nums.empty())
         {
-            return false;
+            return -1;
         }
         int size(nums.size());
         int step(0);
-        bool reach(true);
         for (int i(0); i < size - 1;)
         {
             int end = min(size - 1, i + nums[i]);
@@ -41,12 +40,12 @@ public:
                 }
                 else
                 {
-                    reach = false;
+                    step = -1;
                     break;
                 }
                 i = next;
             }
         }
-        return reach;
+        return step;
     }
 };

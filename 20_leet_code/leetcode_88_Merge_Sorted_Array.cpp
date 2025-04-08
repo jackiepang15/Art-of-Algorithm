@@ -1,33 +1,31 @@
 #include <vector>
-#include <map>
-#include <string>
-#include <limits>
 
 using namespace std;
 
 class Solution
 {
 public:
-    void merge(int A[], int m, int B[], int n)
+    void merge(vector<int> &nums1, int m, vector<int> &nums2, int n)
     {
-        int i(0), j(0);
-        std::vector<int> C;
-        while (i < m && j < n)
+        int i3(m + n - 1);
+        --m, --n;
+        while (m >= 0 && n >= 0)
         {
-            C.push_back(A[i] < B[j] ? A[i++] : B[j++]);
+            nums1[i3--] = nums1[m] >= nums2[n] ? nums1[m--] : nums2[n--];
         }
-        if (i < m)
+        if (m >= 0)
         {
-            C.insert(C.end(), A + i, A + m);
+            while (m >= 0)
+            {
+                nums1[i3--] = nums1[m--];
+            }
         }
-        if (j < n)
+        else
         {
-            C.insert(C.end(), B + j, B + n);
-        }
-        int k(0);
-        for (auto e : C)
-        {
-            A[k++] = e;
+            while (n >= 0)
+            {
+                nums1[i3--] = nums2[n--];
+            }
         }
     }
 };

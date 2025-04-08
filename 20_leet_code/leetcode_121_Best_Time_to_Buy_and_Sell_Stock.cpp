@@ -1,7 +1,4 @@
 #include <vector>
-#include <map>
-#include <string>
-#include <limits>
 
 using namespace std;
 
@@ -10,17 +7,24 @@ class Solution
 public:
     int maxProfit(vector<int> &prices)
     {
-        int maxValue = std::numeric_limits<int>::lowest();
-        int current = 0;
-        for (int i = 1; i < prices.size(); i++)
+        int profit(0);
+        if (prices.empty())
         {
-            current += prices[i] - prices[i - 1];
-            maxValue = std::max<int>(maxValue, current);
-            if (current < 0)
+            return profit;
+        }
+        int size(prices.size()), buy(prices.front());
+        for (int i = 1; i < size; ++i)
+        {
+            int sell(prices[i]);
+            if (sell >= buy)
             {
-                current = 0;
+                profit = max(profit, sell - buy);
+            }
+            else
+            {
+                buy = sell;
             }
         }
-        return maxValue > 0 ? maxValue : 0;
+        return profit;
     }
 };

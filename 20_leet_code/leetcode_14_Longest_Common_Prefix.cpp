@@ -1,7 +1,5 @@
 #include <vector>
-#include <map>
 #include <string>
-#include <limits>
 
 using namespace std;
 
@@ -11,33 +9,23 @@ public:
     string longestCommonPrefix(vector<string> &strs)
     {
         string result;
-        if (strs.empty())
+        int size(strs.size());
+        bool fail(false);
+        while (!fail)
         {
-            return result;
-        }
-        int size(0);
-        int minSize(strs.front().size());
-        for (const auto &s : strs)
-        {
-            minSize = min<int>(minSize, s.size());
-        }
-        while (size < minSize)
-        {
-            bool match(true);
-            char c(strs.front()[size]);
-            for (const auto &s : strs)
+            fail = strs[0].size() == result.size();
+            if (!fail)
             {
-                if (!(match = s[size] == c))
+                char c(strs[0][result.size()]);
+                for (int i = 1; i < size && !fail; ++i)
                 {
-                    break;
+                    fail = strs[i].size() == result.size() || strs[i][result.size()] != c;
+                }
+                if (!fail)
+                {
+                    result.push_back(c);
                 }
             }
-            if (!match)
-            {
-                break;
-            }
-            result += c;
-            ++size;
         }
         return result;
     }

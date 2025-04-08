@@ -1,25 +1,36 @@
-#include <vector>
 #include <map>
 #include <string>
-#include <limits>
 
 using namespace std;
 
 class Solution
 {
 public:
+    map<char, int> m = {
+        {'I', 1},
+        {'V', 5},
+        {'X', 10},
+        {'L', 50},
+        {'C', 100},
+        {'D', 500},
+        {'M', 1000}};
+
     int romanToInt(string s)
     {
-        map<char, int> number{
-            {'I', 1}, {'V', 5}, {'X', 10}, {'L', 50}, {'C', 100}, {'D', 500}, {'M', 1000}};
-
-        int total(0), left(0);
-        for (auto &c : s)
+        if (s.empty())
         {
-            int v(number[c]);
-            total += v > left ? v - left * 2 : v;
-            left = v;
+            return 0;
         }
-        return total;
+        int v(m[s[0]]);
+        int size(s.size());
+        for (int i = 1; i < size; ++i)
+        {
+            v += m[s[i]];
+            if (m[s[i]] > m[s[i - 1]])
+            {
+                v -= m[s[i - 1]] * 2;
+            }
+        }
+        return v;
     }
 };

@@ -1,7 +1,4 @@
 #include <vector>
-#include <map>
-#include <string>
-#include <limits>
 
 using namespace std;
 
@@ -10,11 +7,27 @@ class Solution
 public:
     void rotate(vector<int> &nums, int k)
     {
-        vector<int> numbers(nums.size());
-        for (int i = 0; i < nums.size(); i++)
+        int size(nums.size());
+        k = k % size;
+        if (k == 0)
         {
-            numbers[(i + k) % nums.size()] = nums[i];
+            return;
         }
-        nums = numbers;
+        int count(0);
+        for (int start = 0; start < k && count < size; ++start)
+        {
+            int curr = start;
+            int next = (curr - k + size) % size;
+            int val = nums[start];
+            while (next != start)
+            {
+                nums[curr] = nums[next];
+                ++count;
+                curr = next;
+                next = (curr - k + size) % size;
+            }
+            nums[curr] = val;
+            ++count;
+        }
     }
 };
