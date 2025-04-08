@@ -148,9 +148,29 @@ A Glance Ahead.
 
 The Beginnings of Complex Function Theory.
 
+---
+
+pp. 642.
+
+---
+
 The Geometrical Representation of Complex Numbers.
 
 The Foundation of Complex Function Theory.
+
+Weierstrass's Approach to Function Theory.
+
+Elliptic Functions.
+
+Hyperelliptic Integrals and Abel's Theorem.
+
+Riemann and Multiple-Valued Functions.
+
+Abelian Integrals and Functions.
+
+Conformal Mapping.
+
+The Representation of Functions and Exceptional Value.
 
 ---
 
