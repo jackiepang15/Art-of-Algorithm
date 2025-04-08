@@ -1,30 +1,19 @@
-#include <vector>
-#include <map>
-#include <string>
-#include <limits>
-
-using namespace std;
-
 class Solution
 {
 public:
     int climbStairs(int n)
     {
-        if (n < 2)
+        if (n < 3)
         {
-            return 1;
+            return n;
         }
-        else
+        int x(1), y(2);
+        for (int i = 3; i <= n; ++i)
         {
-            int a = 1;
-            int b = 1;
-            for (int i = 1; i < n; i++)
-            {
-                int c = a + b;
-                a = b;
-                b = c;
-            }
-            return b;
+            int z(x + y);
+            x = y;
+            y = z;
         }
+        return y;
     }
 };
