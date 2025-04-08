@@ -1,5 +1,5 @@
 #include <string>
-#include <vector>
+#include <unordered_set>
 
 using namespace std;
 
@@ -8,27 +8,31 @@ class Solution
 public:
     int lengthOfLongestSubstring(string s)
     {
-        vector<int> number;
-        for (auto c : s)
+        int size(s.size());
+        if (size == 0)
         {
-            number.push_back((int)c);
+            return 0;
         }
-        int maxLength(0), length(0), start(0);
-        vector<int> counter(256);
-        for (int i = 0; i < number.size(); ++i)
+        unordered_set<char> exist;
+        int start(0), end(-1), maxLen(0);
+        while (end < size - 1)
         {
-            ++counter[number[i]];
-            ++length;
-            while (counter[number[i]] > 1)
+            while (end < size - 1 && exist.count(s[end + 1]) == 0)
             {
-                --counter[number[start++]];
-                --length;
+                ++end;
+                exist.insert(s[end]);
+                int len(end - start + 1);
+                if (len > maxLen)
+                {
+                    maxLen = len;
+                }
             }
-            if (maxLength < length)
+            while (end < size - 1 && exist.count(s[end + 1]) > 0)
             {
-                maxLength = length;
+                exist.erase(s[start]);
+                ++start;
             }
         }
-        return maxLength;
+        return maxLen;
     }
 };
