@@ -1,22 +1,25 @@
-#include <vector>
-#include <map>
-#include <string>
-#include <limits>
-
-using namespace std;
-
 class Solution
 {
 public:
     int mySqrt(int x)
     {
-        double prev(x), delta(x);
-        while (delta >= 1e-6)
+        if (x < 2)
         {
-            double cur(prev - (prev * prev - x) / (2 * prev));
-            delta = abs(cur - prev);
-            prev = cur;
+            return x;
         }
-        return (int)prev;
+        int begin(1), end(x - 1);
+        while (begin < end)
+        {
+            int mid((begin + end) / 2);
+            if ((mid + 1) <= x / (mid + 1))
+            {
+                begin = mid + 1;
+            }
+            else
+            {
+                end = mid;
+            }
+        }
+        return begin;
     }
 };

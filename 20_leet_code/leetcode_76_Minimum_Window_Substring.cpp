@@ -1,7 +1,6 @@
-#include <vector>
-#include <map>
 #include <string>
-#include <limits>
+#include <unordered_map>
+#include <iostream>
 
 using namespace std;
 
@@ -10,41 +9,48 @@ class Solution
 public:
     string minWindow(string s, string t)
     {
-        map<int, int> cha;
-        vector<map<int, int>> pos('z' - 'A' + 1);
-        for (int i = 0; i < t.size(); ++i)
+        unordered_map<char, int> number;
+        for (int i = t.size() - 1; i >= 0; --i)
         {
-            int c(t[i] - 'A');
-            pos[c].insert({-1 - i, i});
-            cha.insert({-1 - i, i});
+            ++number[t[i]];
         }
-
-        string res;
-        for (int i = 0; i < s.size(); ++i)
+        string minWin;
+        int start(0), end(-1), total(t.size());
+        unordered_map<char, int> counter;
+        while (end + 1 < s.size())
         {
-            int c(s[i] - 'A');
-            map<int, int> &m(pos[c]);
-            if (!m.empty())
+            while (end + 1 < s.size() && total > 0)
             {
-                int f(m.begin()->first);
-                int p(m.begin()->second);
-                m.erase(f);
-                m.insert({i, p});
-                cha.erase(f);
-                cha.insert({i, p});
-                int first(cha.begin()->first);
-                if (first >= 0)
+                ++end;
+                char c(s[end]);
+                if (number.count(c) > 0)
                 {
-                    if (res.empty() || (i - first + 1) < res.size())
+                    ++counter[c];
+                    if (counter[c] <= number[c])
                     {
-                        res = s.substr(first, i - first + 1);
+                        --total;
                     }
                 }
-                // cout << "i: " << i << endl;
-                // cout << "p: " << p << endl;
-                // cout << "size: " << size[i] << endl;
+            }
+            while (start <= end && total == 0)
+            {
+                char c(s[start]);
+                if (number.count(c) > 0)
+                {
+                    if (counter[c] <= number[c])
+                    {
+                        int size(end - start + 1);
+                        if (minWin.size() == 0 || size < minWin.size())
+                        {
+                            minWin = s.substr(start, size);
+                        }
+                        ++total;
+                    }
+                    --counter[c];
+                }
+                ++start;
             }
         }
-        return res;
+        return minWin;
     }
 };
