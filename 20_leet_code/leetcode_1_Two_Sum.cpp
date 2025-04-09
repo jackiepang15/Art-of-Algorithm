@@ -1,42 +1,24 @@
 #include <vector>
-#include <algorithm>
+#include <unordered_map>
 
 using namespace std;
-
-bool compare(pair<int, int> i, pair<int, int> j)
-{
-    return i.second < j.second;
-}
 
 class Solution
 {
 public:
     vector<int> twoSum(vector<int> &nums, int target)
     {
-        vector<pair<int, int>> numbers;
-        int index(0);
-        for (auto num : nums)
+        unordered_map<int, int> exist;
+        for (int i = nums.size() - 1; i >= 0; --i)
         {
-            numbers.push_back(pair<int, int>(index++, num));
+            int num(nums[i]);
+            const auto &iter(exist.find(target - num));
+            if (iter != exist.end())
+            {
+                return vector<int>({iter->second, i});
+            }
+            exist[num] = i;
         }
-
-        sort(numbers.begin(), numbers.end(), compare);
-        int first(0);
-        int second(numbers.size() - 1);
-        while (true)
-        {
-            while (numbers[first].second + numbers[second].second < target)
-            {
-                ++first;
-            }
-            while (numbers[first].second + numbers[second].second > target)
-            {
-                --second;
-            }
-            if (numbers[first].second + numbers[second].second == target)
-            {
-                return vector<int>({numbers[first].first, numbers[second].first});
-            }
-        }
+        return vector<int>();
     }
 };

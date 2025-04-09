@@ -1,7 +1,5 @@
-#include <vector>
-#include <map>
 #include <string>
-#include <limits>
+#include <unordered_map>
 
 using namespace std;
 
@@ -10,19 +8,28 @@ class Solution
 public:
     bool isAnagram(string s, string t)
     {
-        vector<int> countS(26), countT(26);
-        for (const auto &c : s)
+        unordered_map<char, int> sMap;
+        for (const auto &k : s)
         {
-            countS[c - 'a']++;
+            ++sMap[k];
         }
-        for (const auto &c : t)
+
+        unordered_map<char, int> tMap;
+        for (const auto &k : t)
         {
-            countT[c - 'a']++;
+            ++tMap[k];
         }
-        for (int i = 0; i < 26; ++i)
+
+        if (sMap.size() != tMap.size())
         {
-            if (countS[i] != countT[i])
+            return false;
+        }
+        for (const auto &kv : sMap)
+        {
+            if (tMap.count(kv.first) == 0 || kv.second != tMap[kv.first])
+            {
                 return false;
+            }
         }
         return true;
     }

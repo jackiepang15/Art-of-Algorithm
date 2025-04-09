@@ -1,9 +1,8 @@
 #include <vector>
 #include <map>
-#include <string>
 #include <set>
 #include <algorithm>
-#include <limits>
+#include <functional>
 
 using namespace std;
 
@@ -12,7 +11,6 @@ class Solution
 public:
     vector<pair<int, int>> getSkyline(vector<vector<int>> &buildings)
     {
-
         // Step 1:
         multimap<int, int> coords;
         for (const vector<int> &building : buildings)

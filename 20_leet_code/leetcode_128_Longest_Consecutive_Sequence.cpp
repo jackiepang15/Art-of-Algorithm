@@ -1,8 +1,5 @@
 #include <vector>
-#include <map>
-#include <unordered_map>
-#include <string>
-#include <limits>
+#include <unordered_set>
 
 using namespace std;
 
@@ -11,19 +8,21 @@ class Solution
 public:
     int longestConsecutive(vector<int> &nums)
     {
-        unordered_map<int, int> m;
-        int max = 0;
-        for (auto i : nums)
+        unordered_set<int> s(nums.begin(), nums.end());
+        int maxLength(0);
+        for (const auto &x : s)
         {
-            if (m[i])
+            if (s.count(x - 1) > 0)
             {
                 continue;
             }
-            int left = m[i - 1];
-            int right = m[i + 1];
-            int length = m[i] = m[i + right] = m[i - left] = right + left + 1;
-            max = std::max<int>(max, length);
+            int y(x + 1);
+            while (s.count(y) > 0)
+            {
+                ++y;
+            }
+            maxLength = max<int>(maxLength, y - x);
         }
-        return max;
+        return maxLength;
     }
 };
