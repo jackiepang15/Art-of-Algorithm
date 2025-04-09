@@ -1,8 +1,6 @@
 #include <vector>
-#include <map>
 #include <string>
 #include <set>
-#include <limits>
 
 using namespace std;
 
@@ -11,18 +9,25 @@ class Solution
 public:
     bool wordBreak(string s, vector<string> &wordDict)
     {
-        set<string> wordSet(wordDict.begin(), wordDict.end());
-        vector<bool> segment(s.size(), false);
-        for (int i = 0; i < s.size(); ++i)
+        set<int> wordLength;
+        for (auto w : wordDict)
         {
-            for (int j = 0; j <= i && !segment[i]; ++j)
+            wordLength.insert(w.size());
+        }
+        set<string> wordSet(wordDict.begin(), wordDict.end());
+        vector<bool> segment(s.size() + 1, false);
+        segment[0] = true;
+        for (int i = 1; i <= s.size(); ++i)
+        {
+            for (auto l : wordLength)
             {
-                if (wordSet.find(s.substr(j, i - j + 1)) != wordSet.end())
+                if (l <= i && wordSet.count(s.substr(i - l, l)))
                 {
-                    segment[i] = j == 0 || segment[j - 1];
+                    if (segment[i] = segment[i] || segment[i - l])
+                        break;
                 }
             }
         }
-        return !s.empty() && segment[s.size() - 1];
+        return segment[s.size()];
     }
 };
