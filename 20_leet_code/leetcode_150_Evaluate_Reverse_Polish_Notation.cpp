@@ -1,7 +1,6 @@
 #include <vector>
-#include <map>
 #include <string>
-#include <limits>
+#include <set>
 
 using namespace std;
 
@@ -10,52 +9,38 @@ class Solution
 public:
     int evalRPN(vector<string> &tokens)
     {
-        vector<int> nums(1, 0);
-        int total(0);
-        vector<string> rTokens(tokens.rbegin(), tokens.rend());
-        while (!rTokens.empty())
+        set<string> operators({"+", "-", "*", "/"});
+        vector<string> stack;
+        for (const auto &t : tokens)
         {
-            int opt(-1);
-            string &s(rTokens.back());
-            rTokens.pop_back();
-            size_t pos(s.find_first_of("+-*/"));
-            if (s.size() > 1 || pos == string::npos)
+            if (operators.count(t) == 0)
             {
-                int num(stoi(s));
-                nums.push_back(num);
-                // cout << "num+: " << num << endl;
+                stack.push_back(t);
             }
             else
             {
-                int r(nums.back());
-                nums.pop_back();
-                // cout << "num-: " << r << endl;
-                int l(nums.back());
-                nums.pop_back();
-                // cout << "num-: " << l << endl;
-                int res(0);
-                switch (s[pos])
+                int y(stoi(stack.back()));
+                stack.pop_back();
+                int x(stoi(stack.back()));
+                stack.pop_back();
+                if (t.compare("+") == 0)
                 {
-                case '+':
-                    res = l + r;
-                    break;
-                case '-':
-                    res = l - r;
-                    break;
-                case '*':
-                    res = l * r;
-                    break;
-                case '/':
-                    res = l / r;
-                    break;
-                default:
-                    break;
+                    stack.push_back(to_string(x + y));
                 }
-                // cout << "opt: " << s[pos] << endl;
-                nums.push_back(res);
-                // cout << "num+: " << res << endl;
+                else if (t.compare("-") == 0)
+                {
+                    stack.push_back(to_string(x - y));
+                }
+                else if (t.compare("*") == 0)
+                {
+                    stack.push_back(to_string(x * y));
+                }
+                else
+                {
+                    stack.push_back(to_string(x / y));
+                }
             }
         }
-        return nums.back();
+        return stoi(stack.back());
     }
 };

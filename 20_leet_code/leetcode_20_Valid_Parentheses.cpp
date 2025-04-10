@@ -1,7 +1,5 @@
-#include <vector>
-#include <map>
 #include <string>
-#include <limits>
+#include <stack>
 
 using namespace std;
 
@@ -10,34 +8,27 @@ class Solution
 public:
     bool isValid(string s)
     {
-        if (s.size() == 0)
+        stack<char> q;
+        for (const auto &c : s)
         {
-            return true;
-        }
-
-        std::map<char, char> matches{
-            {'(', ')'},
-            {'{', '}'},
-            {'[', ']'}};
-        std::vector<char> stack;
-        for (auto c : s)
-        {
-            if (c == '(' || c == '{' || c == '[')
+            if (c == '(' || c == '[' || c == '{')
             {
-                stack.push_back(c);
+                q.push(c);
             }
             else
             {
-                if (stack.empty() || c != matches[stack.back()])
+                if (q.empty())
                 {
                     return false;
                 }
-                else
+                char t(q.top());
+                if ((t != '(' && c == ')') || (t != '[' && c == ']') || (t != '{' && c == '}'))
                 {
-                    stack.pop_back();
+                    return false;
                 }
+                q.pop();
             }
         }
-        return stack.empty();
+        return q.empty();
     }
 };
