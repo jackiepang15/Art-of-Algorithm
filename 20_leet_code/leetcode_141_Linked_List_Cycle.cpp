@@ -1,8 +1,4 @@
-#include <vector>
-#include <map>
-#include <string>
-#include <set>
-#include <limits>
+#include <unordered_set>
 
 using namespace std;
 
@@ -18,27 +14,16 @@ class Solution
 public:
     bool hasCycle(ListNode *head)
     {
-        if (!head)
+        unordered_set<ListNode *> exist;
+        while (head)
         {
-            return false;
-        }
-
-        std::set<ListNode *> visited;
-        ListNode *node = head;
-        do
-        {
-            ListNode *nodeNext = node->next;
-            if (visited.count(node) == 0)
-            {
-                visited.insert(node);
-            }
-            else
+            if (exist.count(head) > 0)
             {
                 return true;
             }
-            node = nodeNext;
-        } while (node);
-
+            exist.insert(head);
+            head = head->next;
+        }
         return false;
     }
 };
