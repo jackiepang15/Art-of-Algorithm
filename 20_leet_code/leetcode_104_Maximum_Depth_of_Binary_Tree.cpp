@@ -1,7 +1,4 @@
-#include <vector>
-#include <map>
-#include <string>
-#include <limits>
+#include <algorithm>
 
 using namespace std;
 
@@ -10,7 +7,7 @@ struct TreeNode
     int val;
     TreeNode *left;
     TreeNode *right;
-    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
 };
 
 class Solution
@@ -18,7 +15,7 @@ class Solution
 public:
     int maxDepth(TreeNode *root)
     {
-        if (NULL == root)
+        if (nullptr == root)
         {
             return 0;
         }

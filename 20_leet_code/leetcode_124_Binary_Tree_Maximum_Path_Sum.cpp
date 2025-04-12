@@ -1,7 +1,5 @@
-#include <vector>
-#include <map>
-#include <string>
 #include <limits>
+#include <algorithm>
 
 using namespace std;
 
@@ -10,7 +8,7 @@ struct TreeNode
     int val;
     TreeNode *left;
     TreeNode *right;
-    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
 };
 
 class Solution
@@ -18,7 +16,7 @@ class Solution
 public:
     int maxPathSumSingle(TreeNode *root, int &maxPath)
     {
-        if (root == NULL)
+        if (root == nullptr)
         {
             return 0;
         }

@@ -1,8 +1,4 @@
 #include <vector>
-#include <list>
-#include <map>
-#include <string>
-#include <limits>
 
 using namespace std;
 
@@ -19,46 +15,34 @@ class Solution
 public:
     vector<vector<int>> levelOrder(TreeNode *root)
     {
-        if (!root)
+        vector<vector<int>> result;
+        if (root == nullptr)
         {
-            return std::vector<std::vector<int>>();
+            return result;
         }
-
-        std::list<std::vector<int>> ret;
-        std::vector<int> values;
-        std::list<TreeNode *> list(1, root);
-        for (auto node : list)
+        vector<TreeNode *> vec;
+        int start(vec.size());
+        vec.push_back(root);
+        while (start < vec.size())
         {
-            values.push_back(node->val);
-        }
-        ret.push_back(values);
-
-        while (!list.empty())
-        {
-            std::vector<TreeNode *> queue;
-            for (auto node : list)
+            int size(vec.size());
+            vector<int> level(size - start);
+            for (int i = start; i < size; ++i)
             {
-                if (node->left)
+                TreeNode *n(vec[i]);
+                level[i - start] = n->val;
+                if (n->left)
                 {
-                    queue.push_back(node->left);
+                    vec.push_back(n->left);
                 }
-                if (node->right)
+                if (n->right)
                 {
-                    queue.push_back(node->right);
+                    vec.push_back(n->right);
                 }
             }
-            list.assign(queue.begin(), queue.end());
-
-            if (list.size())
-            {
-                values.clear();
-                for (auto node : list)
-                {
-                    values.push_back(node->val);
-                }
-                ret.push_back(values);
-            }
+            result.push_back(level);
+            start = size;
         }
-        return std::vector<std::vector<int>>(ret.begin(), ret.end());
+        return result;
     }
 };

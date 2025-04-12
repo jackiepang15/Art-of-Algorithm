@@ -7,38 +7,32 @@ struct TreeNode
     int val;
     TreeNode *left;
     TreeNode *right;
-    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+    TreeNode() : val(0), left(nullptr), right(nullptr) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
 class Solution
 {
 public:
-    vector<vector<int>> zigzagLevelOrder(TreeNode *root)
+    vector<double> averageOfLevels(TreeNode *root)
     {
-        vector<vector<int>> result;
+        vector<double> result;
         if (root == nullptr)
         {
             return result;
         }
-        bool zig(true);
         vector<TreeNode *> vec;
         int start(vec.size());
         vec.push_back(root);
         while (start < vec.size())
         {
             int size(vec.size());
-            vector<int> level(size - start);
+            double val(0.0);
             for (int i = start; i < size; ++i)
             {
                 TreeNode *n(vec[i]);
-                if (zig)
-                {
-                    level[i - start] = n->val;
-                }
-                else
-                {
-                    level[size - 1 - i] = n->val;
-                }
+                val += n->val;
                 if (n->left)
                 {
                     vec.push_back(n->left);
@@ -48,9 +42,8 @@ public:
                     vec.push_back(n->right);
                 }
             }
-            result.push_back(level);
+            result.push_back(val / (size - start));
             start = size;
-            zig = !zig;
         }
         return result;
     }
