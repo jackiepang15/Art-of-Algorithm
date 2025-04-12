@@ -1,3 +1,5 @@
+#include <cstddef>
+
 struct ListNode
 {
     int val;
@@ -12,35 +14,36 @@ class Solution
 public:
     ListNode *addTwoNumbers(ListNode *l1, ListNode *l2)
     {
-        ListNode *parent(nullptr), *result(nullptr);
-        while (l1 || l2 || (parent && parent->val >= 10))
+        ListNode *head(NULL), *l3(NULL);
+        int carry(0);
+        while (l1 || l2)
         {
-            ListNode *l3(new ListNode());
-            if (parent)
-            {
-                parent->next = l3;
-            }
-            else
-            {
-                result = l3;
-            }
             if (l1)
             {
-                l3->val += l1->val;
+                carry += l1->val;
                 l1 = l1->next;
             }
             if (l2)
             {
-                l3->val += l2->val;
+                carry += l2->val;
                 l2 = l2->next;
             }
-            if (parent)
+            if (l3)
             {
-                l3->val += parent->val / 10;
-                parent->val = parent->val % 10;
+                l3->next = new ListNode(carry % 10);
+                l3 = l3->next;
             }
-            parent = l3;
+            else
+            {
+                head = new ListNode(carry % 10);
+                l3 = head;
+            }
+            carry /= 10;
         }
-        return result;
+        if (carry)
+        {
+            l3->next = new ListNode(carry);
+        }
+        return head;
     }
 };

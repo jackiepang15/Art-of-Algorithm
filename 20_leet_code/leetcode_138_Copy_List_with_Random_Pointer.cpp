@@ -1,43 +1,55 @@
 #include <vector>
-#include <map>
 #include <unordered_map>
-#include <string>
-#include <limits>
 
 using namespace std;
 
-struct RandomListNode
+class Node
 {
-    int label;
-    RandomListNode *next, *random;
-    RandomListNode(int x) : label(x), next(NULL), random(NULL) {}
+public:
+    int val;
+    Node *next;
+    Node *random;
+
+    Node(int _val)
+    {
+        val = _val;
+        next = NULL;
+        random = NULL;
+    }
 };
 
 class Solution
 {
 public:
-    RandomListNode *copyRandomList(RandomListNode *head)
+    Node *copyRandomList(Node *head)
     {
         if (head == NULL)
         {
             return NULL;
         }
-
-        RandomListNode *n(NULL), *newN(NULL);
-        RandomListNode *newHead = new RandomListNode(head->label);
-        vector<RandomListNode *> newM(1, newHead);
-        unordered_map<RandomListNode *, int> p({{head, 0}});
-        for (n = head->next, newN = newHead; n != NULL; n = n->next)
+        Node *node(head);
+        unordered_map<Node *, int> map = {{node, 0}};
+        Node *newHead = new Node(head->val);
+        Node *newNode(newHead);
+        vector<Node *> vec(1, newNode);
+        while (node->next)
         {
-            newN->next = new RandomListNode(n->label);
-            newN = newN->next;
-            newM.push_back(newN);
-            int s(p.size());
-            p[n] = s;
+            node = node->next;
+            map[node] = map.size();
+            newNode->next = new Node(node->val);
+            newNode = newNode->next;
+            vec.push_back(newNode);
         }
-        for (n = head, newN = newHead; n != NULL; n = n->next, newN = newN->next)
+        node = head;
+        newNode = newHead;
+        while (node)
         {
-            newN->random = n->random == NULL ? NULL : newM[p[n->random]];
+            if (node->random)
+            {
+                newNode->random = vec[map[node->random]];
+            }
+            node = node->next;
+            newNode = newNode->next;
         }
         return newHead;
     }
