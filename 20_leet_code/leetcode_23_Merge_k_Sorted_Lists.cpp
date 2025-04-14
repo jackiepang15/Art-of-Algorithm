@@ -1,7 +1,5 @@
 #include <vector>
-#include <map>
-#include <string>
-#include <limits>
+#include <queue>
 
 using namespace std;
 
@@ -19,34 +17,30 @@ class Solution
 public:
     ListNode *mergeKLists(vector<ListNode *> &lists)
     {
-        multimap<int, ListNode *> m;
-        for (const auto &l : lists)
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+        for (int i = lists.size() - 1; i >= 0; --i)
         {
-            if (l)
-            {
-                m.insert({l->val, l});
-            }
-        }
-        ListNode *head(nullptr), *n(nullptr);
-        while (!m.empty())
-        {
-            auto top(m.begin());
+            ListNode *&n(lists[i]);
             if (n)
             {
-                n->next = new ListNode(top->first);
-                n = n->next;
+                pq.push(make_pair(n->val, i));
             }
-            else
-            {
-                n = head = new ListNode(top->first);
-            }
-            ListNode *c(top->second->next);
-            if (c)
-            {
-                m.insert({c->val, c});
-            }
-            m.erase(top);
         }
-        return head;
+        ListNode dump;
+        ListNode *cur = &dump;
+        while (pq.size() > 0)
+        {
+            int i(pq.top().second);
+            pq.pop();
+            ListNode *&n(lists[i]);
+            cur->next = n;
+            cur = n;
+            n = n->next;
+            if (n)
+            {
+                pq.push(make_pair(n->val, i));
+            }
+        }
+        return dump.next;
     }
 };

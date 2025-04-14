@@ -1,15 +1,10 @@
-#include <vector>
-#include <map>
-#include <string>
-#include <limits>
-
-using namespace std;
-
 struct ListNode
 {
     int val;
     ListNode *next;
-    ListNode(int x) : val(x), next(NULL) {}
+    ListNode() : val(0), next(nullptr) {}
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x, ListNode *next) : val(x), next(next) {}
 };
 
 class Solution
@@ -17,13 +12,13 @@ class Solution
 public:
     ListNode *sortList(ListNode *head)
     {
-        if (head == NULL || head->next == NULL)
+        if (head == nullptr || head->next == nullptr)
             return head;
 
         ListNode *slow = head;
         ListNode *fast = head->next;
 
-        while (fast != NULL && fast->next != NULL)
+        while (fast != nullptr && fast->next != nullptr)
         {
             slow = slow->next;
             fast = fast->next->next;
@@ -31,17 +26,17 @@ public:
 
         // divide the list into two parts
         fast = slow->next;
-        slow->next = NULL;
+        slow->next = nullptr;
 
         return merge(sortList(head), sortList(fast));
     }
 
     ListNode *merge(ListNode *l1, ListNode *l2)
     {
-        ListNode dump(0);
+        ListNode dump;
         ListNode *cur = &dump;
 
-        while (l1 != NULL && l2 != NULL)
+        while (l1 != nullptr && l2 != nullptr)
         {
             if (l1->val < l2->val)
             {
@@ -56,7 +51,7 @@ public:
             cur = cur->next;
         }
 
-        if (l1 != NULL)
+        if (l1 != nullptr)
             cur->next = l1;
         else
             cur->next = l2;
