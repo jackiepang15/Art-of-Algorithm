@@ -1,26 +1,23 @@
 #include <vector>
-#include <map>
-#include <string>
 #include <algorithm>
-#include <limits>
 
 using namespace std;
 
 class Solution
 {
 public:
-    vector<int> findOrder(int numCourses, vector<pair<int, int>> &prerequisites)
+    vector<int> findOrder(int numCourses, vector<vector<int>> &prerequisites)
     {
-        vector<vector<int>> outs(numCourses);
+        vector<vector<int>> out(numCourses);
         for (const auto &p : prerequisites)
         {
-            outs[p.first].push_back(p.second);
+            out[p[0]].push_back(p[1]);
         }
 
         vector<int> in(numCourses, 0);
         for (const auto &p : prerequisites)
         {
-            in[p.second]++;
+            in[p[1]]++;
         }
 
         vector<int> zeros;
@@ -43,7 +40,7 @@ public:
             int z(zeros.back());
             zeros.pop_back();
             res.push_back(z);
-            for (const auto &o : outs[z])
+            for (const auto &o : out[z])
             {
                 if (--in[o] == 0)
                 {

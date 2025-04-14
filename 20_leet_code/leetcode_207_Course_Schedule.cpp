@@ -1,43 +1,47 @@
 #include <vector>
-#include <map>
-#include <string>
-#include <limits>
 
 using namespace std;
 
 class Solution
 {
 public:
-    bool canFinish(int numCourses, vector<pair<int, int>> &prerequisites)
+    bool canFinish(int numCourses, vector<vector<int>> &prerequisites)
     {
-        vector<vector<int>> parents(numCourses);
+        if (prerequisites.empty())
+        {
+            return true;
+        }
+        vector<vector<int>> edges(numCourses);
         for (const auto &p : prerequisites)
         {
-            parents[p.first].push_back(p.second);
+            edges[p[0]].push_back(p[1]);
         }
         for (int i = 0; i < numCourses; ++i)
         {
-            vector<bool> visited(numCourses, false);
-            vector<int> queue(1, i);
-            while (!queue.empty())
+            if (edges[i].empty())
             {
-                int c(queue.back());
-                queue.pop_back();
-                if (visited[c])
+                continue;
+            }
+            vector<bool> visited(numCourses);
+            vector<int> vec;
+            vec.push_back(i);
+            visited[i] = true;
+            while (vec.size() > 0)
+            {
+                int node(vec.back());
+                vec.pop_back();
+                for (const auto &e : edges[node])
                 {
-                    if (c == i)
+                    if (e == i)
                     {
                         return false;
                     }
-                    else
+                    if (visited[e])
                     {
                         continue;
                     }
-                }
-                visited[c] = true;
-                for (const auto &p : parents[c])
-                {
-                    queue.push_back(p);
+                    vec.push_back(e);
+                    visited[e] = true;
                 }
             }
         }

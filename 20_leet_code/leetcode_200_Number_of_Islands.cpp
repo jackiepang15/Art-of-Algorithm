@@ -10,55 +10,43 @@ class Solution
 public:
     int numIslands(vector<vector<char>> &grid)
     {
-        if (grid.empty())
-        {
-            return 0;
-        }
-
-        int count(0);
-        int rows(grid.size());
-        int columns(grid.front().size());
-        vector<vector<int>> directions{{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
-        vector<vector<bool>> visit(rows);
-        for (auto &r : visit)
-        {
-            r.resize(columns, false);
-        }
+        vector<pair<int, int>> directions = {
+            make_pair(1, 0),
+            make_pair(0, 1),
+            make_pair(-1, 0),
+            make_pair(0, -1)};
+        int rows(grid.size()), cols(grid.front().size());
+        vector<vector<bool>> visited(rows, vector<bool>(cols));
+        int num(0);
         for (int r = 0; r < rows; ++r)
         {
-            for (int c = 0; c < columns; ++c)
+            for (int c = 0; c < cols; ++c)
             {
-                if (grid[r][c] == '0' || visit[r][c])
+                if (visited[r][c] || grid[r][c] == '0')
                 {
                     continue;
                 }
-
-                vector<int> queue;
-                queue.push_back(r * columns + c);
-                visit[r][c] = true;
-
-                while (!queue.empty())
+                ++num;
+                vector<pair<int, int>> positions(1, make_pair(r, c));
+                visited[r][c] = true;
+                while (positions.size() > 0)
                 {
-                    int index(queue.back());
-                    queue.pop_back();
-
-                    int r1(index / columns);
-                    int c1(index % columns);
+                    pair<int, int> p(positions.back());
+                    positions.pop_back();
                     for (const auto &d : directions)
                     {
-                        int r2(r1 + d[0]);
-                        int c2(c1 + d[1]);
-                        if (r2 >= 0 && r2 < rows && c2 >= 0 && c2 < columns &&
-                            grid[r2][c2] == '1' && !visit[r2][c2])
+                        int rr(p.first + d.first);
+                        int cc(p.second + d.second);
+                        if (rr < 0 || rr >= rows || cc < 0 || cc >= cols || visited[rr][cc] || grid[rr][cc] == '0')
                         {
-                            queue.push_back(r2 * columns + c2);
-                            visit[r2][c2] = true;
+                            continue;
                         }
+                        positions.push_back(make_pair(rr, cc));
+                        visited[rr][cc] = true;
                     }
                 }
-                count++;
             }
         }
-        return count;
+        return num;
     }
 };
