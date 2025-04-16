@@ -1,7 +1,4 @@
-#include <vector>
-#include <map>
-#include <string>
-#include <limits>
+#include <cstdint>
 
 using namespace std;
 
@@ -13,7 +10,7 @@ public:
         uint32_t m = 0;
         for (int i = 0; i < 32; i++)
         {
-            m = (m << 1) + (n & 1);
+            m = (m << 1) | (n & 1);
             n >>= 1;
         }
         return m;
