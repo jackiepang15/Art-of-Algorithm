@@ -1,7 +1,5 @@
 #include <vector>
-#include <map>
 #include <string>
-#include <limits>
 
 using namespace std;
 
@@ -29,7 +27,6 @@ public:
             if (r >= 0 && r < rows && c >= 0 && c < cols &&
                 !visit[idx] && board[r][c] == word[path.size()])
             {
-                // cout << "+ (" << r << ", " << c << "): " << word[path.size()] << endl;
                 visit[idx] = true;
                 path.push_back(idx);
                 int ret = search(board, word, path, visit);
@@ -39,7 +36,6 @@ public:
                 }
                 path.pop_back();
                 visit[idx] = false;
-                // cout << "- (" << r << ", " << c << "): " << word[path.size()] << endl;
             }
         }
         return false;
@@ -65,7 +61,6 @@ public:
                     vector<int> path(0);
                     vector<int> visit(rows * cols, false);
                     int index(r * cols + c);
-                    // cout << "+ (" << r << ", " << c << "): " << word[path.size()] << endl;
                     visit[index] = true;
                     path.push_back(index);
                     int ret = search(board, word, path, visit);
