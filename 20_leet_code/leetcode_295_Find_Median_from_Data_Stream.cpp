@@ -1,8 +1,4 @@
-#include <vector>
-#include <map>
-#include <string>
 #include <set>
-#include <limits>
 
 using namespace std;
 
@@ -11,79 +7,57 @@ class MedianFinder
 public:
     multiset<int> left, right;
 
-    /** initialize your data structure here. */
     MedianFinder()
     {
     }
 
     void addNum(int num)
     {
-        if (left.empty() || right.empty())
+        if (left.size() <= right.size())
         {
-            if (right.empty())
-            {
-                left.insert(num);
-            }
-            else
-            {
-                right.insert(num);
-            }
+            left.insert(num);
         }
         else
         {
-            if (num <= *right.begin())
-            {
-                left.insert(num);
-            }
-            else
-            {
-                right.insert(num);
-            }
+            right.insert(num);
         }
-        if (left.size() > right.size() + 1)
+        if (right.size() > 0)
         {
-            int v(*left.rbegin());
-            left.erase(next(left.rbegin()).base());
-            right.insert(v);
-        }
-        if (right.size() > left.size() + 1)
-        {
-            int v(*right.begin());
-            right.erase(right.begin());
-            left.insert(v);
+            int leftVal(*prev(left.end()));
+            int rightVal(*right.begin());
+            if (leftVal > rightVal)
+            {
+                left.erase(prev(left.end()));
+                left.insert(rightVal);
+                right.erase(right.begin());
+                right.insert(leftVal);
+            }
         }
     }
 
     double findMedian()
     {
-        if (left.size() != right.size())
+        if (left.size() > 0)
         {
-            if (left.size() > right.size())
+            if (left.size() == right.size())
             {
-                return *left.rbegin();
+                return (*left.rbegin() + *right.begin()) / 2.0;
             }
             else
             {
-                return *right.begin();
+                return *left.rbegin();
             }
         }
         else
         {
-            if (left.empty() || right.empty())
-            {
-                return -1;
-            }
-            else
-            {
-                return (*left.rbegin() + *right.begin()) * 0.5;
-            }
+            return 0.0;
         }
     }
 };
 
 /**
  * Your MedianFinder object will be instantiated and called as such:
- * MedianFinder obj = new MedianFinder();
- * obj.addNum(num);
- * double param_2 = obj.findMedian();
+ * MedianFinder* obj = new MedianFinder();
+ * obj->addNum(num);
+ * double param_2 = obj->findMedian();
  */
