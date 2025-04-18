@@ -1,95 +1,83 @@
 #include <vector>
-#include <map>
 #include <string>
 #include <set>
-#include <limits>
 
 using namespace std;
 
 class Solution
 {
-public:
-    vector<pair<int, int>> directions;
-    int rows, cols;
-
-    bool search(vector<vector<char>> &board, const string &word, vector<int> &path, vector<int> &visit)
+    struct TrieNode
     {
-        if (path.size() == word.size())
-        {
-            return true;
-        }
+        TrieNode *children[26];
+        string word;
 
-        int index(path.back());
-        int row(index / cols);
-        int col(index % cols);
-        for (int i = 0; i < 4; ++i)
+        TrieNode() : word("")
         {
-            int r(row + directions[i].first);
-            int c(col + directions[i].second);
-            int idx(r * cols + c);
-            if (r >= 0 && r < rows && c >= 0 && c < cols &&
-                !visit[idx] && board[r][c] == word[path.size()])
+            for (int i = 0; i < 26; i++)
             {
-                // cout << "+ (" << r << ", " << c << "): " << word[path.size()] << endl;
-                visit[idx] = true;
-                path.push_back(idx);
-                int ret = search(board, word, path, visit);
-                if (ret)
-                {
-                    return true;
-                }
-                path.pop_back();
-                visit[idx] = false;
-                // cout << "- (" << r << ", " << c << "): " << word[path.size()] << endl;
+                children[i] = nullptr;
             }
         }
-        return false;
-    }
+    };
 
+public:
     vector<string> findWords(vector<vector<char>> &board, vector<string> &words)
     {
-        if (board.empty())
+        TrieNode *root = buildTrie(words);
+        vector<string> result;
+        for (int i = 0; i < board.size(); i++)
         {
-            return vector<string>();
-        }
-        directions = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
-        vector<string> res;
-        for (const auto &word : set<string>(words.begin(), words.end()))
-        {
-            if (!word.empty() && exist(board, word))
+            for (int j = 0; j < board[0].size(); j++)
             {
-                res.push_back(word);
+                dfs(board, i, j, root, result);
             }
         }
-        return res;
+        return result;
     }
 
-    bool exist(vector<vector<char>> &board, string word)
+    /** Inserts a word into the trie. */
+    TrieNode *buildTrie(vector<string> &words)
     {
-        rows = board.size();
-        cols = board.front().size();
-        vector<int> path(0);
-        vector<int> visit(rows * cols, false);
-        for (int r = 0; r < rows; ++r)
+        TrieNode *root = new TrieNode();
+        for (int j = 0; j < words.size(); j++)
         {
-            for (int c = 0; c < cols; ++c)
+            string word = words[j];
+            TrieNode *curr = root;
+            for (int i = 0; i < word.length(); i++)
             {
-                if (board[r][c] == word.front())
+                char c = word[i] - 'a';
+                if (curr->children[c] == nullptr)
                 {
-                    int index(r * cols + c);
-                    // cout << "+ (" << r << ", " << c << "): " << word[path.size()] << endl;
-                    visit[index] = true;
-                    path.push_back(index);
-                    int ret = search(board, word, path, visit);
-                    if (ret)
-                    {
-                        return true;
-                    }
-                    path.pop_back();
-                    visit[index] = false;
+                    curr->children[c] = new TrieNode();
                 }
+                curr = curr->children[c];
             }
+            curr->word = word;
         }
-        return false;
+        return root;
+    }
+
+    void dfs(vector<vector<char>> &board, int i, int j, TrieNode *p, vector<string> &result)
+    {
+        char c = board[i][j];
+        if (c == '#' || !p->children[c - 'a'])
+            return;
+        p = p->children[c - 'a'];
+        if (p->word.size() > 0)
+        {
+            result.push_back(p->word);
+            p->word = "";
+        }
+
+        board[i][j] = '#';
+        if (i > 0)
+            dfs(board, i - 1, j, p, result);
+        if (j > 0)
+            dfs(board, i, j - 1, p, result);
+        if (i < board.size() - 1)
+            dfs(board, i + 1, j, p, result);
+        if (j < board[0].size() - 1)
+            dfs(board, i, j + 1, p, result);
+        board[i][j] = c;
     }
 };

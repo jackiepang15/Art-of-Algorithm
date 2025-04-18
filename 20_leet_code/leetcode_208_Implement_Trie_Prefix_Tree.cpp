@@ -1,7 +1,5 @@
-#include <vector>
 #include <map>
 #include <string>
-#include <limits>
 
 using namespace std;
 
@@ -54,12 +52,8 @@ public:
                 return false;
             }
             n = n->next[c];
-            if (i == word.size() - 1)
-            {
-                return n->leaf;
-            }
         }
-        return true;
+        return n->leaf;
     }
 
     /** Returns if there is any word in the trie that starts with the given prefix. */
