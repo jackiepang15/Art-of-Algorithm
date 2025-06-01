@@ -1,5 +1,5 @@
 ---
-marp: true
+marp: false
 math: katex
 ---
 
@@ -1855,7 +1855,7 @@ $$
 
 ---
 
-Any system of "kernel" functions $K_n(z)$ such that 
+Any system of "kernel" functions $K_n(z)$ such that
 $$
 \sum_n g_n K_n(z) = 0 \Longrightarrow g_n = 0 \; \text{for all} \; n
 $$
