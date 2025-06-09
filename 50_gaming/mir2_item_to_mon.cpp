@@ -12,18 +12,14 @@
 using namespace std;
 using json = nlohmann::json;
 
-/**/
-const string PATH_SERVER = "D:\\Mirserver";
-/*/
-const string PATH_SERVER = "D:\\games\\传奇\\MirServer-main";
-//*/
+const string PATH_SERVER = "D:\\others\\Mir2_Crystal\\Server";
 
-const string PATH_MON_ITEMS = PATH_SERVER + "\\Mir200\\Envir\\MonItems";
-const string PATH_MON_GEN = PATH_SERVER + "\\Mir200\\Envir\\MonGen.txt";
+const string PATH_MON_ITEMS = PATH_SERVER + "\\Envir\\Drops";
+const string PATH_MON_SPAWN = PATH_SERVER + "\\Exports\\SpawnsExport.txt";
 
 const string PATH_JSON = PATH_SERVER;
-const string PATH_JSON_MON = PATH_JSON + "\\mon.json";
 const string PATH_JSON_ITEM = PATH_JSON + "\\item.json";
+const string PATH_JSON_MON = PATH_JSON + "\\mon.json";
 
 vector<string> split_string_by_regex(const string &str, const string &regex_str)
 {
@@ -99,42 +95,71 @@ void convert_item_to_json(const string &path_item, const string &path_json)
 {
     map<string, vector<vector<string>>> map_item;
 
-    for (const auto &entry : filesystem::directory_iterator(filesystem::u8path(path_item)))
+    vector<filesystem::path> path_list(1, filesystem::u8path(path_item));
+    int begin(0), end(path_list.size());
+    while (begin < end)
     {
-        const auto &p(entry.path());
-        if (!filesystem::is_regular_file(p))
+        for (int i = begin; i < end; ++i)
         {
-            continue;
+            for (const auto &entry : filesystem::directory_iterator(path_list[i]))
+            {
+                const auto &p(entry.path());
+                if (!filesystem::is_directory(p))
+                {
+                    continue;
+                }
+                const auto &dir_name(p.stem().string());
+                if (dir_name == "Unused")
+                {
+                    continue;
+                }
+                path_list.push_back(p);
+            }
         }
-        const auto &ext(p.extension().string());
-        if (ext != ".txt")
+        begin = end;
+        end = path_list.size();
+    }
+
+    for (const auto &path : path_list)
+    {
+        for (const auto &entry : filesystem::directory_iterator(path))
         {
-            continue;
-        }
-        const string &mon_name(p.stem().string());
-        string line_item;
-        ifstream file_item(p);
-        if (!file_item.is_open())
-        {
-            continue;
-        }
-        while (getline(file_item, line_item))
-        {
-            const string &line(convert_ansi_to_utf8(line_item));
-            vector<string> terms(split_string_by_regex(line, "[\t ]+"));
-            if (terms.size() < 2)
+            const auto &p(entry.path());
+            if (!filesystem::is_regular_file(p))
             {
                 continue;
             }
-            if (terms.size() == 2)
+            const auto &ext(p.extension().string());
+            if (ext != ".txt")
             {
-                terms.push_back("1");
+                continue;
             }
-            const string &item_name(terms[1]);
-            terms.push_back(mon_name);
-            map_item[item_name].push_back(terms);
+            const string &mon_name(p.stem().string());
+            string line_item;
+            ifstream file_item(p);
+            if (!file_item.is_open())
+            {
+                continue;
+            }
+            while (getline(file_item, line_item))
+            {
+                const string &line(convert_ansi_to_utf8(line_item));
+                vector<string> terms(split_string_by_regex(line, "[\t ]+"));
+                if (terms.size() < 2)
+                {
+                    continue;
+                }
+                if (terms.size() == 2)
+                {
+                    terms.push_back("1");
+                }
+                terms.resize(3);
+                const string &item_name(terms[1]);
+                terms.push_back(mon_name);
+                map_item[item_name].push_back(terms);
+            }
+            file_item.close();
         }
-        file_item.close();
     }
 
     json obj_item = json::object();
@@ -177,17 +202,22 @@ void convert_mon_to_json(const string &path_mon, const string &path_json)
             }
             if (line[0] == ';')
             {
-                if (line.find('-') == string::npos && line.find('\t') == string::npos)
+                if (line.find('-') == string::npos && line.find(',') == string::npos)
                 {
                     map_name = line.substr(1);
                 }
                 continue;
             }
-            vector<string> terms(split_string_by_regex(line, "[\t ]+"));
-            if (terms.size() < 7)
+            vector<string> terms(split_string_by_regex(line, "[, ]+"));
+            if (terms.size() < 8)
             {
                 continue;
             }
+            if (terms.size() == 8)
+            {
+                terms.push_back("");
+            }
+            terms.resize(9);
             const string &mon_name(terms[3]);
             terms.push_back(map_name);
             map_mon[mon_name].push_back(terms);
@@ -202,10 +232,12 @@ void convert_mon_to_json(const string &path_mon, const string &path_json)
         for (const auto &terms : value)
         {
             json obj = json::object();
-            obj["position"] = terms[0] + "_" + terms[7] + "(" + terms[1] + "," + terms[2] + ")";
-            obj["range"] = stoi(terms[4]);
-            obj["number"] = stoi(terms[5]);
-            obj["time"] = stoi(terms[6]);
+            obj["location"] = terms[0] + "(" + terms[1] + "," + terms[2] + ")";
+            obj["spread"] = stoi(terms[4]);
+            obj["count"] = stoi(terms[5]);
+            obj["delay"] = stoi(terms[6]);
+            obj["direction"] = stoi(terms[7]);
+            obj["route"] = terms[8];
             obj_position.push_back(obj);
         }
         obj_mon[key] = obj_position;
@@ -223,7 +255,47 @@ int main()
 {
     convert_item_to_json(PATH_MON_ITEMS, PATH_JSON_ITEM);
 
-    convert_mon_to_json(PATH_MON_GEN, PATH_JSON_MON);
+    convert_mon_to_json(PATH_MON_SPAWN, PATH_JSON_MON);
 
     return 0;
 }
+
+/*
+private void ExportMonGenButton_Click(object sender, EventArgs e)
+{
+    if (_selectedMapInfos.Count == 0) return;
+
+    SaveFileDialog sfd = new SaveFileDialog();
+    sfd.InitialDirectory = Path.Combine(Application.StartupPath, "Exports");
+    sfd.Filter = "Text File|*.txt";
+    sfd.ShowDialog();
+
+    if (sfd.FileName == string.Empty) return;
+
+    for (int i = 0; i < _selectedMapInfos.Count; i++)
+    {
+        using (StreamWriter sw = File.AppendText(sfd.FileNames[0]))
+        {
+            for (int j = 0; j < _selectedMapInfos[i].Respawns.Count; j++)
+            {
+                MonsterInfo mob = Envir.GetMonsterInfo(_selectedMapInfos[i].Respawns[j].MonsterIndex);
+
+                if (mob == null) continue;
+
+                string Output = $"{_selectedMapInfos[i].FileName}" +
+                    $",{_selectedMapInfos[i].Respawns[j].Location.X}" +
+                    $",{_selectedMapInfos[i].Respawns[j].Location.Y}" +
+                    $",{mob.Name}" +
+                    $",{_selectedMapInfos[i].Respawns[j].Spread}" +
+                    $",{_selectedMapInfos[i].Respawns[j].Count}" +
+                    $",{_selectedMapInfos[i].Respawns[j].Delay}" +
+                    $",{_selectedMapInfos[i].Respawns[j].Direction}" +
+                    $",{_selectedMapInfos[i].Respawns[j].RoutePath}";
+
+                sw.WriteLine(Output);
+            }
+        }
+    }
+    MessageBox.Show("MonGen Export complete");
+}
+*/
