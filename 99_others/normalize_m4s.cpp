@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iostream>
+#include <filesystem>
 #include <string>
 #include <locale>
 #include <codecvt>
@@ -11,6 +12,14 @@ using json = nlohmann::json;
 
 const string PATH_VIDEO = "H:\\Videos\\test";
 const string PATH_VIDEO_INFO = PATH_VIDEO + "\\.videoInfo";
+
+bool isFloatStream(const string& str) {
+    stringstream ss(str);
+    float f;
+    char remaining;
+    // Attempt to extract a float and then check if anything else remains
+    return (ss >> f && !(ss >> remaining));
+}
 
 void trim_file_bytes(const string &input_filename, const string &output_filename, size_t bytes_to_trim)
 {
@@ -41,7 +50,7 @@ void trim_file_bytes(const string &input_filename, const string &output_filename
 
     // Read the remaining content from the input file and write to the output file
     // Using a buffer for efficient reading and writing
-    std::vector<char> buffer(4096); // 4KB buffer
+    vector<char> buffer(4096); // 4KB buffer
     while (input_file.read(buffer.data(), buffer.size()))
     {
         output_file.write(buffer.data(), buffer.size());
@@ -50,10 +59,125 @@ void trim_file_bytes(const string &input_filename, const string &output_filename
     output_file.write(buffer.data(), input_file.gcount());
 
     // Close the files
-    input_file.close();
     output_file.close();
+    input_file.close();
 
     cout << "Log - trim_file_bytes: file successfully trimmed and saved to " << output_filename << endl;
+}
+
+int norm_path(const string &path)
+{
+    string path_info(path + "\\.videoInfo");
+    ifstream file_info(path_info);
+    if (!file_info.is_open())
+    {
+        cerr << "Error - path_info: opening file failed." << endl;
+        file_info.close();
+        return 1;
+    }
+    if (!json::accept(file_info))
+    {
+        cerr << "Error - path_info: not a valid json file." << endl;
+        file_info.close();
+        return 1;
+    }
+    file_info.seekg(0);
+    json jf = json::parse(file_info);
+    if (!jf.is_object())
+    {
+        cerr << "Error - path_info: not a json object." << endl;
+        file_info.close();
+        return 1;
+    }
+    if (!jf.contains("title"))
+    {
+        cerr << "Error - path_info: key 'title' doesn't exist." << endl;
+        file_info.close();
+        return 1;
+    }
+    string title(jf["title"]);
+    if (!jf.contains("groupTitle"))
+    {
+        cerr << "Error - path_info: key 'groupTitle' doesn't exist." << endl;
+        file_info.close();
+        return 1;
+    }
+    string group_title(jf["groupTitle"]);
+    string filename_txt(path + "\\" + group_title + "-" + title + ".txt");
+    if (filesystem::exists(filename_txt))
+    {
+        cerr << "Error - filename_txt: file already exists." << endl;
+        file_info.close();
+        return 1;
+    }
+    cout << "Log - Text: " << filename_txt << endl;
+    ofstream file_txt(filename_txt, ios::out | ios::binary);
+    file_txt.close();
+    file_info.close();
+
+    vector<string> input_files;
+    for (const auto &entry : filesystem::directory_iterator(path))
+    {
+        const auto &p(entry.path());
+        if (!filesystem::is_regular_file(p))
+        {
+            continue;
+        }
+        const auto &ext(p.extension().string());
+        if (ext != ".m4s")
+        {
+            continue;
+        }
+        const string &input_filename(p.string());
+        input_files.push_back(input_filename);
+    }
+    if (input_files.size() != 2)
+    {
+        cerr << "Error - input_files: not exact two m4s files." << endl;
+        return 1;
+    }
+
+    vector<string> output_files;
+    int index(0);
+    for (const auto &filename : input_files)
+    {
+        const string &filename_m4s(path + "\\" + to_string(index) + ".m4s");
+        if (filesystem::exists(filename_m4s))
+        {
+            cerr << "Error - filename_m4s: file already exists." << endl;
+            return 1;
+        }
+        output_files.push_back(filename_m4s);
+        cout << "Log - M4S: " << filename_m4s << endl;
+        trim_file_bytes(filename, filename_m4s, 9);
+        ++index;
+    }
+
+    string filename_mp4(path + "\\" + title + ".mp4");
+    if (filesystem::exists(filename_mp4))
+    {
+        cerr << "Error - filename_mp4: file already exists." << endl;
+        return 1;
+    }
+    cout << "Log - MP4: " << filename_mp4 << endl;
+    string cmd("ffmpeg.exe -i \"" + output_files[0] + "\" -i \"" + output_files[1] + "\" -codec copy \"" + filename_mp4 + "\"");
+    // cout << "Log - CMD: " << cmd << endl;
+    int ret(0);
+    if (!(ret = system(cmd.c_str())))
+    {
+        return ret;
+    }
+
+    // Attempt to remove the file
+    for (const auto &filename : output_files)
+    {
+        if (remove(filename.c_str()) != 0) {
+            cerr << "Error - output_files: deleting file failed." << endl;
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 int main(int argc, char *argv[])
@@ -71,69 +195,31 @@ int main(int argc, char *argv[])
         cin >> path;
     }
 
-    string path_info(path + "\\.videoInfo");
-    ifstream file_info(path_info);
-    if (!file_info.is_open())
-    {
-        cerr << "Error - path_info: opening file failed." << endl;
-        return 1;
-    }
-    if (!json::accept(file_info))
-    {
-        cerr << "Error - path_info: not a valid json file." << endl;
-        return 1;
-    }
-    file_info.seekg(0);
-    json jf = json::parse(file_info);
-    if (!jf.is_object())
-    {
-        cerr << "Error - path_info: not a json object." << endl;
-        return 1;
-    }
-    if (!jf.contains("title"))
-    {
-        cerr << "Error - path_info: key 'title' doesn't exist." << endl;
-        return 1;
-    }
-    string title(jf["title"]);
-    if (!jf.contains("groupTitle"))
-    {
-        cerr << "Error - path_info: key 'groupTitle' doesn't exist." << endl;
-        return 1;
-    }
-    string group_title(jf["groupTitle"]);
-    string filename_text(path + "\\" + group_title + "-" + title + ".txt");
-    cout << "Log - Text: " << filename_text << endl;
-    ofstream file_txt(filename_text, ios::out | ios::binary);
-    file_txt.close();
-
-    vector<string> file_list;
+    vector<filesystem::path> path_list;
     for (const auto &entry : filesystem::directory_iterator(path))
     {
         const auto &p(entry.path());
-        if (!filesystem::is_regular_file(p))
+        if (!filesystem::is_directory(p))
         {
             continue;
         }
-        const auto &ext(p.extension().string());
-        if (ext != ".m4s")
+        const auto &dir_name(p.stem().string());
+        if (!isFloatStream(dir_name))
         {
             continue;
         }
-        const string &input_filename(p.string());
-        file_list.push_back(input_filename);
+        path_list.push_back(p);
     }
-    if (file_list.size() != 2)
+    
+    for (const auto &p : path_list)
     {
-        cerr << "Error - file_list: not exact two m4s files." << endl;
-        return 1;
+        const string &path(p.string());
+        int ret(0);
+        if (!(ret = norm_path(path)))
+        {
+            return ret;
+        }
     }
-    int index(0);
-    for (const auto &input_filename : file_list)
-    {
-        const string &output_filename(path + "\\" + to_string(index) + ".m4s");
-        trim_file_bytes(input_filename, output_filename, 9);
-        ++index;
-    }
+
     return 0;
 }
