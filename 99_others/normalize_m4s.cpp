@@ -13,7 +13,8 @@ using json = nlohmann::json;
 const string PATH_VIDEO = "H:\\Videos\\test";
 const string PATH_VIDEO_INFO = PATH_VIDEO + "\\.videoInfo";
 
-bool isFloatStream(const string& str) {
+bool isFloatStream(const string &str)
+{
     stringstream ss(str);
     float f;
     char remaining;
@@ -27,14 +28,14 @@ void trim_file_bytes(const string &input_filename, const string &output_filename
     ifstream input_file(input_filename, ios::in | ios::binary);
     if (!input_file.is_open())
     {
-        cerr << "Error - trim_file_bytes: opening input file: " << input_filename << endl;
+        cerr << " > Err - Tri: opening input file: " << input_filename << endl;
         return;
     }
 
     // Skip the first multiple bytes in the input file
     if (!input_file.seekg(bytes_to_trim, ios::beg))
     {
-        cerr << "Error - trim_file_bytes: seeking in input file. The file might be too small." << endl;
+        cerr << " > Err - Tri: seeking in input file. The file might be too small." << endl;
         input_file.close();
         return;
     }
@@ -43,7 +44,7 @@ void trim_file_bytes(const string &input_filename, const string &output_filename
     ofstream output_file(output_filename, ios::out | ios::binary);
     if (!output_file.is_open())
     {
-        cerr << "Error - trim_file_bytes: opening output file: " << output_filename << endl;
+        cerr << " > Err - Tri: opening output file: " << output_filename << endl;
         input_file.close();
         return;
     }
@@ -61,8 +62,6 @@ void trim_file_bytes(const string &input_filename, const string &output_filename
     // Close the files
     output_file.close();
     input_file.close();
-
-    cout << "Log - trim_file_bytes: file successfully trimmed and saved to " << output_filename << endl;
 }
 
 int norm_path(const string &path)
@@ -71,13 +70,13 @@ int norm_path(const string &path)
     ifstream file_info(path_info);
     if (!file_info.is_open())
     {
-        cerr << "Error - path_info: opening file failed." << endl;
+        cerr << " > Err - Inf: opening file failed." << endl;
         file_info.close();
         return 1;
     }
     if (!json::accept(file_info))
     {
-        cerr << "Error - path_info: not a valid json file." << endl;
+        cerr << " > Err - Inf: not a valid json file." << endl;
         file_info.close();
         return 1;
     }
@@ -85,20 +84,20 @@ int norm_path(const string &path)
     json jf = json::parse(file_info);
     if (!jf.is_object())
     {
-        cerr << "Error - path_info: not a json object." << endl;
+        cerr << " > Err - Inf: not a json object." << endl;
         file_info.close();
         return 1;
     }
     if (!jf.contains("title"))
     {
-        cerr << "Error - path_info: key 'title' doesn't exist." << endl;
+        cerr << " > Err - Inf: key 'title' doesn't exist." << endl;
         file_info.close();
         return 1;
     }
     string title(jf["title"]);
     if (!jf.contains("groupTitle"))
     {
-        cerr << "Error - path_info: key 'groupTitle' doesn't exist." << endl;
+        cerr << " > Err - Inf: key 'groupTitle' doesn't exist." << endl;
         file_info.close();
         return 1;
     }
@@ -106,11 +105,11 @@ int norm_path(const string &path)
     string filename_txt(path + "\\" + group_title + "-" + title + ".txt");
     if (filesystem::exists(filename_txt))
     {
-        cerr << "Error - filename_txt: file already exists." << endl;
+        cerr << " > Err - Txt: file already exists." << endl;
         file_info.close();
         return 1;
     }
-    cout << "Log - Text: " << filename_txt << endl;
+    cout << " > Log - Txt: " << filename_txt << endl;
     ofstream file_txt(filename_txt, ios::out | ios::binary);
     file_txt.close();
     file_info.close();
@@ -133,7 +132,7 @@ int norm_path(const string &path)
     }
     if (input_files.size() != 2)
     {
-        cerr << "Error - input_files: not exact two m4s files." << endl;
+        cerr << " > Err - M4s: not exact two m4s files." << endl;
         return 1;
     }
 
@@ -144,11 +143,11 @@ int norm_path(const string &path)
         const string &filename_m4s(path + "\\" + to_string(index) + ".m4s");
         if (filesystem::exists(filename_m4s))
         {
-            cerr << "Error - filename_m4s: file already exists." << endl;
+            cerr << " > Err - M4s: file already exists." << endl;
             return 1;
         }
         output_files.push_back(filename_m4s);
-        cout << "Log - M4S: " << filename_m4s << endl;
+        cout << " > Log - M4s: " << filename_m4s << endl;
         trim_file_bytes(filename, filename_m4s, 9);
         ++index;
     }
@@ -156,14 +155,14 @@ int norm_path(const string &path)
     string filename_mp4(path + "\\" + title + ".mp4");
     if (filesystem::exists(filename_mp4))
     {
-        cerr << "Error - filename_mp4: file already exists." << endl;
+        cerr << " > Err - Mp4: file already exists." << endl;
         return 1;
     }
-    cout << "Log - MP4: " << filename_mp4 << endl;
+    cout << " > Log - Mp4: " << filename_mp4 << endl;
     string cmd("ffmpeg.exe -i \"" + output_files[0] + "\" -i \"" + output_files[1] + "\" -codec copy \"" + filename_mp4 + "\"");
-    // cout << "Log - CMD: " << cmd << endl;
-    int ret(0);
-    if (!(ret = system(cmd.c_str())))
+    // cout << " > Log - CMD: " << cmd << endl;
+    int ret(system(cmd.c_str()));
+    if (ret != 0)
     {
         return ret;
     }
@@ -171,10 +170,36 @@ int norm_path(const string &path)
     // Attempt to remove the file
     for (const auto &filename : output_files)
     {
-        if (remove(filename.c_str()) != 0) {
-            cerr << "Error - output_files: deleting file failed." << endl;
+        if (remove(filename.c_str()) != 0)
+        {
+            cerr << " > Err - M4s: deleting file failed." << endl;
             return 1;
         }
+    }
+
+    string filename_jpg(path + "\\image.jpg");
+    string filename_png(path + "\\image.png");
+    if (filesystem::exists(filename_jpg))
+    {
+        cout << " > Log - Jpg: " << filename_jpg << endl;
+        string filename(path + "\\" + title + ".jpg");
+        if (filesystem::exists(filename))
+        {
+            cerr << " > Err - Jpg: file already exists." << endl;
+            return 1;
+        }
+        filesystem::copy_file(filename_jpg, filename);
+    }
+    else if (filesystem::exists(filename_png))
+    {
+        cout << " > Log - Png: " << filename_png << endl;
+        string filename(path + "\\" + title + ".png");
+        if (filesystem::exists(filename))
+        {
+            cerr << " > Err - Png: file already exists." << endl;
+            return 1;
+        }
+        filesystem::rename(filename_png, filename);
     }
 
     return 0;
@@ -191,7 +216,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        cout << "Please input a file path: ";
+        cout << " > Log - Arg: please input a file path > ";
         cin >> path;
     }
 
@@ -210,12 +235,13 @@ int main(int argc, char *argv[])
         }
         path_list.push_back(p);
     }
-    
+
     for (const auto &p : path_list)
     {
         const string &path(p.string());
-        int ret(0);
-        if (!(ret = norm_path(path)))
+        cout << " > Log - Dir: " << path << endl;
+        int ret(norm_path(path));
+        if (ret != 0)
         {
             return ret;
         }
