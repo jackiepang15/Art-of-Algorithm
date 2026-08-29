@@ -10,7 +10,7 @@
 using namespace std;
 using json = nlohmann::json;
 
-const string PATH_VIDEO = "H:\\Videos\\test";
+const string PATH_VIDEO = "D:\\Jackie\\Videos\\test";
 const string PATH_VIDEO_INFO = PATH_VIDEO + "\\.videoInfo";
 
 bool isFloatStream(const string &str)
