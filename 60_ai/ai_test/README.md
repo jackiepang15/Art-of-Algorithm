@@ -16,6 +16,7 @@
 ## Tasks
 
 - Text to Image
+  - DeepSeek V4.1 Flash: 5m 8s, 3817703 tokens
   - DeepSeek V4 Flash: 1m 31s, 60818 tokens
   - Qwen3.7-Max: 1m 47s, 43405 tokens
   - Kimi-K2.6: 1m 49s, 35290 tokens
@@ -27,7 +28,7 @@
   - qwen3.6-35b: 10m 28s, 89020 tokens, Partial Correct（生成的题目配图不是原图）
   - gemma4:26b: >30, 221330 tokens（一直在尝试）, Partial Correct（生成的题目配图缺失）
   - gemma4-12b: No Answer (提前终止)
-  - qwen3.5-9b: No Answer (例题找对了，丹创建 Python 脚本时崩溃了)
+  - qwen3.5-9b: No Answer (例题找对了，但创建 Python 脚本时崩溃了)
 
 ```bash
 使用合理的工具，将 "D:\Jackie\Art\Art-of-Algorithm\60_ai\pdf2md\book_math_1.md" 这个文件中的第一讲的最后一道例题（不包含解答过程和提示）转成图片文件，需要能正确显示例题中的图片和公式。
