@@ -1,8 +1,13 @@
 node_modules
 output
+__pycache__
+tessdata
+temp*
 
 .vscode
 .idea
+.venv
+.env
 *.exe
 *.o
 *.pdf
